@@ -13,9 +13,9 @@ import ru.pet.api_test4.service.BookService;
 
 import java.util.List;
 
-@Validated
+//@Validated
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/book")
 public class BookControllerImp implements BookController {
 
     private final BookService bookService;
@@ -27,7 +27,7 @@ public class BookControllerImp implements BookController {
 
     @Override
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody BookDto book) {
+    public ResponseEntity<?> create(@RequestBody BookDto book) {
         bookService.create(book);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -42,8 +42,8 @@ public class BookControllerImp implements BookController {
     }
 
     @Override
-    @GetMapping("/{idBook}")
-    public ResponseEntity<BookDto> read(@PathVariable(name = "idBook") @NotNull int id) throws NotFoundException {
+    @GetMapping("/{id_book}")
+    public ResponseEntity<BookDto> read(@PathVariable(name = "id_book") int id) throws NotFoundException {
         final BookDto book = bookService.read(id);
 
         return book != null

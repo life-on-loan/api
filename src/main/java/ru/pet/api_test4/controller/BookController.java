@@ -1,7 +1,10 @@
 package ru.pet.api_test4.controller;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.pet.api_test4.dto.BookDto;
 import ru.pet.api_test4.dto.NotFoundException;
@@ -16,6 +19,7 @@ public interface BookController {
      * @param book - новая книга
      * @return
      */
+    @PostMapping
     ResponseEntity<?> create(@RequestBody BookDto book);
 
     /**
@@ -23,6 +27,7 @@ public interface BookController {
      *
      * @return список имеющихся книг
      */
+    @GetMapping
     ResponseEntity<List<BookDto>> read();
 
     /**
@@ -31,6 +36,7 @@ public interface BookController {
      * @param id - id книги
      * @return данные искомой книги
      */
-    ResponseEntity<BookDto> read(@PathVariable(name = "id") int id) throws NotFoundException;
+    @GetMapping
+    ResponseEntity<BookDto> read(@PathVariable(name = "id_book") @NotNull int id) throws NotFoundException;
 }
 

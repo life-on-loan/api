@@ -12,7 +12,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "cart")
 public class CartEntity {
     @Id
-    @Column(name = "id_cart")
+    @Column(name = "id_cart", nullable = false)
     @GeneratedValue(strategy = IDENTITY)
     Integer idCart;
 

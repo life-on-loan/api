@@ -14,10 +14,10 @@ import ru.pet.api_test4.service.CartService;
 
 import java.util.List;
 
-@Validated
+//@Validated
 @RestController
-@RequestMapping("/carts")
-public class CartControllerImp {
+@RequestMapping("/cart")
+public class CartControllerImp implements CartController{
 
     private final CartService cartService;
 
@@ -26,14 +26,16 @@ public class CartControllerImp {
         this.cartService = orderService;
     }
 
+    @Override
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody CartDto cart) {
+    public ResponseEntity<?> create(@RequestBody CartDto cart) {
         cartService.create(cart);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @DeleteMapping("/{idCart}")
-    public ResponseEntity<?> delete(@PathVariable(name = "idCart") @NotNull int id) {
+    @Override
+    @DeleteMapping("/{id_cart}")
+    public ResponseEntity<?> delete(@PathVariable(name = "id_cart")int id) {
         final boolean deleted = cartService.delete(id);
 
         return deleted
@@ -41,8 +43,9 @@ public class CartControllerImp {
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
-    @PutMapping("/{idCart}")
-    public ResponseEntity<?> update(@PathVariable(name = "idCart") @NotNull int id, @RequestBody OrderPosition data) throws NotFoundException {
+    @Override
+    @PutMapping("/{id_cart}")
+    public ResponseEntity<?> update(@PathVariable(name = "id_cart") int id, @RequestBody OrderPosition data) throws NotFoundException {
         Integer idBook = data.getIdBook();
         Integer count = data.getCount();
         final boolean updated = cartService.add(id, idBook, count);
@@ -52,6 +55,7 @@ public class CartControllerImp {
                 : new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
     }
 
+    @Override
     @GetMapping
     public ResponseEntity<List<CartDto>> read() {
         final List<CartDto> books = cartService.readAll();

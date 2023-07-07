@@ -11,11 +11,11 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "book")
 public class BookEntity {
     @Id
-    @Column(name = "id_book")
+    @Column(name = "id_book", nullable = false)
     @GeneratedValue(strategy = IDENTITY)
     Integer idBook;
 
-    @Column(name = "name_book")
+    @Column(name = "name_book", nullable = false)
     String nameBook;
 
     @Column(name = "author")

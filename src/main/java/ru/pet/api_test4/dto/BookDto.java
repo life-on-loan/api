@@ -1,19 +1,17 @@
 package ru.pet.api_test4.dto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
 public class BookDto {
     private Integer idBook;
-
-    @NotBlank
+    //@NotEmpty
     private String nameBook;
     private String author;
     private String genre;
-    @Positive
     private Float costBook;
-    @Positive
     private Integer countPages;
     private String description;
 
@@ -49,7 +47,7 @@ public class BookDto {
         this.genre = genre;
     }
 
-    public @Positive Float getCostBook() {
+    public Float getCostBook() {
         return costBook;
     }
 
