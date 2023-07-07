@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="create_table_book" author="ponomdo">
+        <!-- Прописываем создание таблицы books-->
+        <createTable tableName="book">
+            <!--Создаем поля -->
+            <column autoIncrement="true" name="id_book" type="int">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name_book" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="author" type="varchar(255)">
+            </column>
+            <column name="genre" type="varchar(255)">
+            </column>
+            <column name="cost_book" type="real">
+            </column>
+            <column name="count_pages" type="int">
+            </column>
+            <column name="description" type="varchar(255)">
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="insert-into-book" author="ponomdo">
+        <insert tableName="book">
+            <column name="id_book" valueNumeric="1"/>
+            <column name="name_book" value="First"/>
+            <column name="author" value="ABC"/>
+            <column name="genre" value="testGenre"/>
+            <column name="cost_book" valueNumeric="1.25"/>
+            <column name="count_pages" valueNumeric="567"/>
+            <column name="description" value="abcde bebe"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
