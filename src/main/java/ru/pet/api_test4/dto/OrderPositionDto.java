@@ -1,8 +1,12 @@
 package ru.pet.api_test4.dto;
 
+import jakarta.validation.constraints.Min;
+import lombok.Data;
 
-public class OrderPosition {
+@Data
+public class OrderPositionDto {
     private Integer idBook;
+    @Min(1)
     private Integer count;
 
     public Integer getIdBook() {

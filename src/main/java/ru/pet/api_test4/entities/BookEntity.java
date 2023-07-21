@@ -3,6 +3,9 @@ package ru.pet.api_test4.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 
@@ -32,6 +35,18 @@ public class BookEntity {
 
     @Column(name = "description")
     String description;
+
+    @OneToMany(mappedBy = "book")
+    @Column(name = "cart_elements")
+    List<CartElement> cartElements = new ArrayList<>();
+
+    public List<CartElement> getCartElements() {
+        return cartElements;
+    }
+
+    public void setCartElements(List<CartElement> cartElements) {
+        this.cartElements = cartElements;
+    }
 
     public Integer getIdBook() {
         return idBook;

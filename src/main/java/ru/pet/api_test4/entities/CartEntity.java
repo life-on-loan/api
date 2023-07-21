@@ -3,6 +3,7 @@ package ru.pet.api_test4.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -15,18 +16,18 @@ public class CartEntity {
     @Column(name = "id_cart", nullable = false)
     @GeneratedValue(strategy = IDENTITY)
     Integer idCart;
-
-    @Column(name = "name_books")
+    @Column(name = "cart_elements")
     @ElementCollection
-    List<String> nameBooks;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    List<CartElement> cartElements = new ArrayList<>();
 
-    @Column(name = "cost_books")
-    @ElementCollection
-    List<Float> costBooks;
+    public List<CartElement> getCartElements() {
+        return cartElements;
+    }
 
-    @Column(name = "count_books")
-    @ElementCollection
-    List<Integer> countBooks;
+    public void setCartElements(List<CartElement> cartElements) {
+        this.cartElements = cartElements;
+    }
 
     public Integer getIdCart() {
         return idCart;
@@ -34,29 +35,5 @@ public class CartEntity {
 
     public void setIdCart(Integer idCart) {
         this.idCart = idCart;
-    }
-
-    public List<String> getNameBooks() {
-        return nameBooks;
-    }
-
-    public void setNameBooks(List<String> nameBooks) {
-        this.nameBooks = nameBooks;
-    }
-
-    public List<Float> getCostBooks() {
-        return costBooks;
-    }
-
-    public void setCostBooks(List<Float> costBooks) {
-        this.costBooks = costBooks;
-    }
-
-    public List<Integer> getCountBooks() {
-        return countBooks;
-    }
-
-    public void setCount(List<Integer> count) {
-        this.countBooks = count;
     }
 }

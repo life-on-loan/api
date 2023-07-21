@@ -1,43 +1,41 @@
 package ru.pet.api_test4.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.pet.api_test4.dto.BookDto;
-import ru.pet.api_test4.dto.NotFoundException;
+import ru.pet.api_test4.error.NotFoundException;
 import ru.pet.api_test4.entities.BookEntity;
-import ru.pet.api_test4.mapper.BookListMapperImpl;
-import ru.pet.api_test4.mapper.BookMapperImpl;
+import ru.pet.api_test4.mapper.BookListMapper;
+import ru.pet.api_test4.mapper.BookMapper;
 import ru.pet.api_test4.repository.BookRepository;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Сервис для работы с книгами
  */
 @Service
+@Validated
 public class BookService {
-    @Autowired
-    private BookRepository bookRepository;
-    @Autowired
-    private final BookMapperImpl bookMapperImpl = new BookMapperImpl();
-    @Autowired
-    private final BookListMapperImpl bookListMapper = new BookListMapperImpl(bookMapperImpl);
+    private final String NOT_FOUND_BOOK = "Книга не найдена";
+    private final BookRepository bookRepository;
+    private final BookMapper bookMapper;
+    private final BookListMapper bookListMapper;
+
+    public BookService(BookRepository bookRepository, BookMapper bookMapper, BookListMapper bookListMapper) {
+        this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
+        this.bookListMapper = bookListMapper;
+    }
 
     /**
-     * Переменная для генерации ID книги
-     */
-    private static final AtomicInteger BOOK_ID_HOLDER = new AtomicInteger();
-
-    /**
-     * Создание новой позиции на склад
+     * Создание новой позиции на складе
      *
      * @param bookDto - новая книга
      */
-    public void create(BookDto bookDto) {
-        final int bookId = BOOK_ID_HOLDER.incrementAndGet();
-        bookDto.setIdBook(bookId);
-        BookEntity bookEntity = bookMapperImpl.toEntity(bookDto);
+    public void create(@Valid BookDto bookDto) {
+        BookEntity bookEntity = bookMapper.toEntity(bookDto);
         bookRepository.save(bookEntity);
     }
 
@@ -45,12 +43,10 @@ public class BookService {
      * Возвращает список всех имеющихся книг
      *
      * @return список книг
+     * @throws NotFoundException если список книг пуст
      */
-    public List<BookDto> readAll() {
-        Iterable<BookEntity> booksIterable = bookRepository.findAll();
-        List<BookEntity> books = new ArrayList<>();
-        booksIterable.forEach(books::add);
-        return bookListMapper.toBookDtoList(books);
+    public List<BookDto> readAll()  throws NotFoundException  {
+        return bookListMapper.toBookDtoList(bookRepository.findAll());
     }
 
     /**
@@ -58,8 +54,9 @@ public class BookService {
      *
      * @param id - ID книги
      * @return - объект книги с заданным id
+     * @throws NotFoundException если книга не найдена
      */
     public BookDto read(int id) throws NotFoundException {
-        return bookMapperImpl.toDto(bookRepository.findById(id).orElseThrow(() -> new NotFoundException("Книга не найдена")));
+        return bookMapper.toDto(bookRepository.findById(id).orElseThrow(() -> new NotFoundException(NOT_FOUND_BOOK)));
     }
 }

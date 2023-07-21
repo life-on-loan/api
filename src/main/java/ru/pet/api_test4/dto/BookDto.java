@@ -1,17 +1,19 @@
 package ru.pet.api_test4.dto;
+
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 @Data
 public class BookDto {
     private Integer idBook;
-    //@NotEmpty
+    @NotBlank
     private String nameBook;
     private String author;
     private String genre;
+    @Min(0)
     private Float costBook;
+    @Min(0)
     private Integer countPages;
     private String description;
 

@@ -9,6 +9,5 @@ import java.util.List;
 
 @Mapper(componentModel = "spring", uses = CartMapper.class, injectionStrategy = InjectionStrategy.CONSTRUCTOR)
 public interface CartListMapper {
-    List<CartEntity> toCartEntityList(List<CartDto> dtoList);
     List<CartDto> toCartDtoList(List<CartEntity> entityList);
 }

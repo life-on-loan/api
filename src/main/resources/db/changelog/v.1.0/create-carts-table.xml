@@ -18,5 +18,21 @@
             <column name="count_books" type="int[]">
             </column>
         </createTable>
+
+        <rollback>
+            <dropColumn  tableName="cart" columnName="name_books"/>
+            <dropColumn  tableName="cart" columnName="cost_books"/>
+            <dropColumn  tableName="cart" columnName="count_books"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="add-new-column-cart-elements-into-cart" author="ponomdo">
+        <addColumn tableName="cart">
+            <column name="cart_elements" type="int"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn  tableName="cart" columnName="cart_elements"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>
