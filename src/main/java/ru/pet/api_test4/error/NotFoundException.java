@@ -1,6 +1,6 @@
-package ru.pet.api_test4.dto;
+package ru.pet.api_test4.error;
 
-public class NotFoundException extends Exception{
+public class NotFoundException extends RuntimeException{
     private String message;
 
     public NotFoundException(String message) {

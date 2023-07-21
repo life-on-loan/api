@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+    <changeSet id="create_table_cartelement" author="ponomdo">
+        <!-- Прописываем создание таблицы carts-->
+        <createTable tableName="cart_element">
+            <!--Создаем поля -->
+            <column autoIncrement="true" name="id" type="int">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_cart" type="int">
+            </column>
+            <column name="id_book" type="int">
+            </column>
+            <column name="amount" type="int">
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="foreign-key-cartelement-into-cart" author="ponomdo">
+        <addForeignKeyConstraint baseTableName="cart_element" baseColumnNames="id_cart"
+                                 constraintName="id_cart_in_cart_element"
+                                 referencedTableName="cart" referencedColumnNames="id_cart"/>
+    </changeSet>
+
+    <changeSet id="foreign-key-cartelement-into-book" author="ponomdo">
+        <addForeignKeyConstraint baseTableName="cart_element" baseColumnNames="id_book"
+                                 constraintName="id_book_in_cart_element"
+                                 referencedTableName="book" referencedColumnNames="id_book"/>
+    </changeSet>
+</databaseChangeLog>

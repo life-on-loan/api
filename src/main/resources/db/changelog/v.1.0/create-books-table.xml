@@ -38,4 +38,14 @@
             <column name="description" value="abcde bebe"/>
         </insert>
     </changeSet>
+
+    <changeSet id="add-new-column-cart-elements-into-book" author="ponomdo">
+        <addColumn tableName="book">
+            <column name="cart_elements" type="int"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn  tableName="book" columnName="cart_elements"/>
+        </rollback>
+    </changeSet>
 </databaseChangeLog>

@@ -1,22 +1,24 @@
 package ru.pet.api_test4.controller;
 
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.pet.api_test4.dto.CartDto;
-import ru.pet.api_test4.dto.NotFoundException;
-import ru.pet.api_test4.dto.OrderPosition;
+import ru.pet.api_test4.error.NotFoundException;
+import ru.pet.api_test4.dto.OrderPositionDto;
 
 import java.util.List;
 
+@RequestMapping("/cart")
 public interface CartController {
-    ResponseEntity<?> create(@RequestBody CartDto cart);
+    @PostMapping
+    ResponseEntity<?> create(@RequestBody CartDto cart) throws NotFoundException;
 
+    @DeleteMapping("/{id_cart}")
     ResponseEntity<?> delete(@PathVariable(name = "id_cart") int id);
 
-    ResponseEntity<?> update(@PathVariable(name = "id_cart") int id, @RequestBody OrderPosition data) throws NotFoundException;
+    @PutMapping("/{id_cart}")
+    ResponseEntity<?> update(@PathVariable(name = "id_cart") int id, @RequestBody OrderPositionDto data) throws NotFoundException;
 
-    ResponseEntity<List<CartDto>> read();
+    @GetMapping
+    ResponseEntity<List<CartDto>> read() throws NotFoundException;
 }

@@ -1,91 +1,100 @@
 package ru.pet.api_test4.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.pet.api_test4.dto.BookDto;
 import ru.pet.api_test4.dto.CartDto;
-import ru.pet.api_test4.dto.NotFoundException;
+import ru.pet.api_test4.dto.OrderPositionDto;
+import ru.pet.api_test4.entities.BookEntity;
+import ru.pet.api_test4.entities.CartElement;
+import ru.pet.api_test4.error.NotFoundException;
 import ru.pet.api_test4.entities.CartEntity;
-import ru.pet.api_test4.mapper.CartListMapperImpl;
-import ru.pet.api_test4.mapper.CartMapperImpl;
+import ru.pet.api_test4.mapper.*;
 import ru.pet.api_test4.repository.CartRepository;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Сервис для работы с корзинами покупателей
  */
 @Service
+@Validated
 public class CartService {
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
-    private final CartMapperImpl cartMapperImpl = new CartMapperImpl();
-    @Autowired
-    private final CartListMapperImpl cartListMapper = new CartListMapperImpl(cartMapperImpl);
-
-    /**
-     * Переменная для генерации ID козины
-     */
-    private static final AtomicInteger CART_ID_HOLDER = new AtomicInteger();
+    private final CartRepository cartRepository;
+    private final CartListMapper cartListMapper;
 
     /**
      * Экземпляр сервиса для работы с книгами
      */
-    private static final BookService bookService = new BookService();
+    private final BookService bookService;
+    private final BookMapper bookMapper;
+
+    public CartService(CartRepository cartRepository, CartListMapper cartListMapper, BookService bookService, BookMapper bookMapper) {
+        this.cartRepository = cartRepository;
+        this.cartListMapper = cartListMapper;
+        this.bookService = bookService;
+        this.bookMapper = bookMapper;
+    }
 
     /**
      * Создание новой корзины
      *
      * @param cartDto - новая корзина
+     * @throws NotFoundException если добавляемая в корзину книга не найдена
      */
-    public void create(CartDto cartDto) {
-        final int cartId = CART_ID_HOLDER.incrementAndGet();
-        cartDto.setIdCart(cartId);
-        CartEntity cartEntity = cartMapperImpl.toEntity(cartDto);
-        cartRepository.save(cartEntity);
+    public void create(CartDto cartDto) throws NotFoundException {
+        var cart = new CartEntity();
+
+        for (int i = 0; i < cartDto.getIdBook().size(); i++) {
+            var cartElement = new CartElement();
+            Integer bookId = cartDto.getIdBook().get(i);
+            BookEntity bookFromDb = bookMapper.toEntity(bookService.read(bookId));
+            cartElement.setBook(bookFromDb);
+            cartElement.setAmount(cartDto.getCountBooks().get(i));
+            cartElement.setCart(cart);
+            bookFromDb.getCartElements().add(cartElement);
+            cart.getCartElements().add(cartElement);
+        }
+        cartRepository.save(cart);
     }
 
     /**
      * Добавление новой книги в корзину
      *
      * @param id     - id корзины
-     * @param idBook - id добавляемой книги
-     * @param count  - количество добавляемых книг
+     * @param data   - данные о добавляемой позиции заказа
+     * @throws NotFoundException если добавляемая в корзину книга не найдена
      */
-    public boolean add(int id, int idBook, int count) throws NotFoundException {
-        Object book1 = bookService.read(idBook);
-        if (cartRepository.findById(id).isPresent() && book1 instanceof BookDto) {
-            BookDto bookDto = (BookDto) book1;
-            CartDto cart = cartMapperImpl.toDto(cartRepository.findById(id).get());
+    public boolean add(int id, @Valid OrderPositionDto data) throws NotFoundException {
+        int idBook = data.getIdBook();
+        int count = data.getCount();
+        if (cartRepository.findById(id).isPresent()) {
+            CartEntity cart = cartRepository.findById(id).get();
             boolean isBookInCart = false;
-            List<String> nameBooks = cart.getNameBooks();
-            List<Float> costs = cart.getCostBooks();
-            List<Integer> counts = cart.getCountBooks();
-            int i = 0;
-            while (!isBookInCart && i != nameBooks.size()) {
-                if (nameBooks.get(i).equals(bookDto.getNameBook())) {
+
+            List<CartElement> cartElements = cart.getCartElements();
+            for (CartElement element : cartElements) {
+                if (isBookInCart) {
+                    break;
+                }
+                BookEntity bookEntity = element.getBook();
+                if (idBook == bookEntity.getIdBook()) {
                     isBookInCart = true;
-                } else {
-                    i++;
+                    element.setAmount(element.getAmount() + count);
                 }
             }
+
             if (!isBookInCart) {
-                nameBooks.add(bookDto.getNameBook());
-                costs.add(bookDto.getCostBook());
-                counts.add(count);
-            } else {
-                counts.set(i, counts.get(i) + count);
+                CartElement cartElement = new CartElement();
+                cartElement.setCart(cart);
+                cartElement.setBook(bookMapper.toEntity(bookService.read(idBook)));
+                cartElement.setAmount(count);
+                cart.getCartElements().add(cartElement);
             }
-
-            cart.setNameBooks(nameBooks);
-            cart.setCostBooks(costs);
-            cart.setCountBooks(counts);
-            CartEntity cartEntity = cartMapperImpl.toEntity(cart);
-            cartRepository.save(cartEntity);
-
+            cartRepository.save(cart);
             return true;
         }
         return false;
@@ -103,13 +112,10 @@ public class CartService {
 
     /**
      * Возвращает список всех имеющихся корзин
-     *
      * @return список корзин
+     * @throws NotFoundException если список корзин пуст
      */
-    public List<CartDto> readAll() {
-        Iterable<CartEntity> cartsIterable = cartRepository.findAll();
-        List<CartEntity> carts = new ArrayList<>();
-        cartsIterable.forEach(carts::add);
-        return cartListMapper.toCartDtoList(carts);
+    public List<CartDto> readAll() throws NotFoundException {
+        return cartListMapper.toCartDtoList(cartRepository.findAll());
     }
 }
